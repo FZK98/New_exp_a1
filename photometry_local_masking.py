@@ -15,10 +15,10 @@ from scipy.optimize import curve_fit
 hdulist = fits.open("Mosaic.fits/mosaic.fits")#plt.imshow(data, cmap='gray')
 hdr=hdulist[0].header #meta data 
 data=hdulist[0].data #astro image data
-background_data=[] #empty list - store the relevant background data
+#background_data=[] #empty list - store the relevant background data
 hdulist.close()
 
-# data = data[1500:1650,1900:2000] #[y,x]
+data = data[1500:1650,1900:2000] #[y,x]
 #datatest=hdulist[0].data
 #show the test image taken 
 plt.figure()
@@ -31,7 +31,7 @@ testimagex = np.shape(data)[1]
 popt = np.loadtxt('image_parameters.txt')
 mask = np.loadtxt('mask.txt')
 #this is the sample of the mask that corresponds to the image
-# mask =  mask[1500:1650,1900:2000] #[y,x]
+mask =  mask[1500:1650,1900:2000] #[y,x]
 #displays the mask sample to show is corresponds to the image
 plt.figure()
 plt.imshow(mask)
@@ -62,6 +62,24 @@ def annulus_mask(mask , annulus_mask, x, y, r2):
     mask[y-r2:y+r2 , x-r2:x+r2] = 0
     return annulus_mask
 
+#the same as above, but with circular instead of rectangular apertures
+def inner_mask2(mask_data, inner_mask, x, y, r1):
+	ytemp, xtemp = np.ogrid[:testimagey, :testimagex]
+	radius = np.sqrt((xtemp - x)**2 + (ytemp-y)**2)
+	innermasktemp = radius <= r1
+	mask_datatemp = radius >= r1
+	mask_data *= mask_datatemp
+	return(innermasktemp)
+	
+def annulus_mask2(mask_data, annnulus_mask, x ,y, r2):
+	ytemp, xtemp = np.ogrid[:testimagey, :testimagex]
+	radius = np.sqrt((xtemp - x)**2 + (ytemp-y)**2)
+	annulusmasktemp = radius <= r2
+	mask_datatemp = radius >= r2
+	mask_data *=  mask_datatemp
+	return(annulusmasktemp)
+
+
 r1 =6
 r2 =15
 galaxy_counts = []
@@ -80,8 +98,8 @@ for i in range(len(masked_data_sorted)):
         y = tempPixPos[0][0]
         x = tempPixPos[1][0] 
 
-        innermask = inner_mask(masked_data,mask_1, x, y, r1)
-        outermask = annulus_mask(masked_data,mask_2, x, y, r2)
+        innermask = inner_mask2(masked_data,mask_1, x, y, r1)
+        outermask = annulus_mask2(masked_data,mask_2, x, y, r2)
         
         apeture_flux = np.sum(innermask*data)
         annulus_flux = np.sum(outermask*data) - apeture_flux
