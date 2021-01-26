@@ -52,13 +52,13 @@ def galaxyPhotons(x_centre,y_centre, radius):
     for i in range(x_centre-radius,x_centre+radius):
         for j in range(y_centre-radius,y_centre+radius):
             #if the index is still inside our sample image and the mask is 1 (i.e. readable) 
-            if i<testimagex and i>=0 and j<testimagey and j>=0 and masktest[j,i]==1: #only consider pixels within the image!
+            if i<testimagex and i>=0 and j<testimagey and j>=0 and masktest[j,i]: #only consider pixels within the image!
                 #d is the distance fromthe image 
                 d=np.sqrt((i-x_centre)**2+(j-y_centre)**2)
                 #if d is smaller than the radius
                 if d<radius:
                     #add this photon to the list of photon values
-                    photon_vals.append(datatest[j,i])
+                    photon_vals.append(data[j,i])
                     #scanned pixels get marked off so they aren't rescanned
                     masktest[j,i] = 0 
     #return a sum of all the photon values and the number of pixels scanned
@@ -69,13 +69,13 @@ def localBackground(x_centre,y_centre, initialRadius, secondaryRadius):
     bg_photon_vals=[];
     for i in range(x_centre-secondaryRadius,x_centre+secondaryRadius):#outer x
         for j in range(y_centre-secondaryRadius,y_centre+secondaryRadius):#outer y
-            if i<testimagex and i>=0 and j<testimagey and j>=0 and masktest[j,i] ==1: #only consider pixels within the image!
+            if i<testimagex and i>=0 and j<testimagey and j>=0: #only consider pixels within the image!
                 #diameter of the secondary apeture
                 d2=np.sqrt((i-x_centre)**2+(j-y_centre)**2)
                 #take only points between the two rings 
-                if d2<=secondaryRadius and d2>=initialRadius :
+                if initialRadius <= d2 and d2<=secondaryRadius and masktest[j,i] == 1:
                     #the pixel is added to the list 
-                    bg_photon_vals.append(datatest[j,i])
+                    bg_photon_vals.append(data[j,i])
                     masktest[j,i] = 0 
     #return the average pixel value from the outer apeture
     return(np.sum(bg_photon_vals)/len(bg_photon_vals))
@@ -96,6 +96,7 @@ def initialRad(counts):
 galaxyCounts = []
 galaxyLocation = []
 initial_rad_list = []
+q = 2
 for i in range(len(datatest1d_sorted)): 
     tempPixVal = datatest1d_sorted[-(1+i)] #find highest pixel value
     if tempPixVal > popt[1]+4*popt[2]:
@@ -104,12 +105,16 @@ for i in range(len(datatest1d_sorted)):
             loc = tempPixPos[j]
             if masktest[loc[0],loc[1]] == 1: #if pixel is available to use 
                 initialRadius = int(initialRad(tempPixVal))
-                initial_rad_list.append(initialRadius)
-                galaxyBrightness=galaxyPhotons(loc[1],loc[0],initialRadius)
-                galaxyBackground = localBackground(loc[1],loc[0],initialRadius, int(initialRadius*1.5))
-                galaxyCounts.append(galaxyBrightness[0]-(galaxyBackground*galaxyBrightness[1]))
-                galaxyLocation.append(loc)
-                print(len(datatest1d_sorted) -i)
+                if initialRadius >= 3:
+                    initial_rad_list.append(initialRadius)
+                    galaxyBrightness=galaxyPhotons(loc[1],loc[0],initialRadius)
+                    
+                    secondaryRadius = int(initialRadius*q)
+                    galaxyBackground = localBackground(loc[1],loc[0],initialRadius, secondaryRadius)
+                    # galaxyCounts.append(galaxyBrightness[0]-(popt[1]*galaxyBrightness[1]))
+                    galaxyCounts.append(galaxyBrightness[0]-(galaxyBackground*galaxyBrightness[1]))
+                    galaxyLocation.append(loc)
+                    print(len(datatest1d_sorted) -i)
 
 
 # plt.figure()
@@ -121,7 +126,7 @@ for i in galaxyLocation:
     i = [x, y]
     mycircle = plt.Circle(i, initial_rad_list[p], color= 'k',fill=False)
     plt.gca().add_artist(mycircle)
-    mycircle2 = plt.Circle(i, initial_rad_list[p]*1.5, color= 'k',fill=False)
+    mycircle2 = plt.Circle(i, initial_rad_list[p]*q, color= 'k',fill=False)
     plt.gca().add_artist(mycircle2) 
     p+=1
 plt.show()
