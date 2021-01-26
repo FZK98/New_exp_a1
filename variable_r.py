@@ -17,6 +17,7 @@ data=hdulist[0].data #astro image data
 background_data=[] #empty list - store the relevant background data
 hdulist.close()
 
+unmasked_datatest = data[1500:1650,1900:2000] #[y,x]
 datatest = data[1500:1650,1900:2000] #[y,x]
 #datatest=hdulist[0].data
 #show the test image taken 
@@ -58,7 +59,7 @@ def galaxyPhotons(x_centre,y_centre, radius):
                 #if d is smaller than the radius
                 if d<radius:
                     #add this photon to the list of photon values
-                    photon_vals.append(data[j,i])
+                    photon_vals.append(unmasked_datatest[j,i])
                     #scanned pixels get marked off so they aren't rescanned
                     masktest[j,i] = 0 
     #return a sum of all the photon values and the number of pixels scanned
@@ -75,7 +76,7 @@ def localBackground(x_centre,y_centre, initialRadius, secondaryRadius):
                 #take only points between the two rings 
                 if initialRadius <= d2 and d2<=secondaryRadius and masktest[j,i] == 1:
                     #the pixel is added to the list 
-                    bg_photon_vals.append(data[j,i])
+                    bg_photon_vals.append(unmasked_datatest[j,i])
                     masktest[j,i] = 0 
     #return the average pixel value from the outer apeture
     return(np.sum(bg_photon_vals)/len(bg_photon_vals))
@@ -108,11 +109,10 @@ for i in range(len(datatest1d_sorted)):
                 if initialRadius >= 3:
                     initial_rad_list.append(initialRadius)
                     galaxyBrightness=galaxyPhotons(loc[1],loc[0],initialRadius)
-                    
                     secondaryRadius = int(initialRadius*q)
                     galaxyBackground = localBackground(loc[1],loc[0],initialRadius, secondaryRadius)
-                    # galaxyCounts.append(galaxyBrightness[0]-(popt[1]*galaxyBrightness[1]))
-                    galaxyCounts.append(galaxyBrightness[0]-(galaxyBackground*galaxyBrightness[1]))
+                    galaxyCounts.append(galaxyBrightness[0]-(popt[1]*galaxyBrightness[1]))
+                    #galaxyCounts.append(galaxyBrightness[0]-(galaxyBackground*galaxyBrightness[1]))
                     galaxyLocation.append(loc)
                     print(len(datatest1d_sorted) -i)
 
