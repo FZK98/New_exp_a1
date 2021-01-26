@@ -17,8 +17,9 @@ data=hdulist[0].data #astro image data
 background_data=[] #empty list - store the relevant background data
 hdulist.close()
 
-unmasked_datatest = data[1500:1650,1900:2000] #[y,x]
 datatest = data[1500:1650,1900:2000] #[y,x]
+data = data[1500:1650,1900:2000] #[y,x]
+
 #datatest=hdulist[0].data
 #show the test image taken 
 plt.figure()
@@ -59,7 +60,7 @@ def galaxyPhotons(x_centre,y_centre, radius):
                 #if d is smaller than the radius
                 if d<radius:
                     #add this photon to the list of photon values
-                    photon_vals.append(unmasked_datatest[j,i])
+                    photon_vals.append(data[j,i])
                     #scanned pixels get marked off so they aren't rescanned
                     masktest[j,i] = 0 
     #return a sum of all the photon values and the number of pixels scanned
@@ -76,7 +77,7 @@ def localBackground(x_centre,y_centre, initialRadius, secondaryRadius):
                 #take only points between the two rings 
                 if initialRadius <= d2 and d2<=secondaryRadius and masktest[j,i] == 1:
                     #the pixel is added to the list 
-                    bg_photon_vals.append(unmasked_datatest[j,i])
+                    bg_photon_vals.append(data[j,i])
                     masktest[j,i] = 0 
     #return the average pixel value from the outer apeture
     return(np.sum(bg_photon_vals)/len(bg_photon_vals))
@@ -134,6 +135,10 @@ plt.show()
 plt.figure()
 plt.imshow(masktest)
 plt.show()
+
+np.savetxt("variable_r galaxy counts.txt", galaxyCounts)
+np.savetxt("variable_r galaxy locations.txt", galaxyLocation)
+np.savetxt("variable_r radius lengths.txt", initial_rad_list)
 
 #ZP=2.530E+01
 #def calculateMagnitude(data_points, ZP):
