@@ -60,7 +60,7 @@ def galaxyPhotons(x_centre,y_centre, radius):
                     #add this photon to the list of photon values
                     photon_vals.append(datatest[j,i])
                     #scanned pixels get marked off so they aren't rescanned
-                    masktest[j,i] = 0 
+                    #masktest[j,i] = 0 
     #return a sum of all the photon values and the number of pixels scanned
     return(np.sum(photon_vals), len(photon_vals))
 
@@ -76,6 +76,7 @@ def localBackground(x_centre,y_centre, initialRadius, secondaryRadius):
                 if d2<secondaryRadius and d2>initialRadius :
                     #the pixel is added to the list 
                     bg_photon_vals.append(datatest[j,i])
+                masktest[j,i] = 0
     #return the average pixel value from the outer apeture
     return(np.sum(bg_photon_vals)/len(bg_photon_vals))
 
