@@ -5,7 +5,7 @@ Created on Tue Jan 12 16:14:24 2021
 @author: maria
 """
 no_objects = 20 #how many galaxies
-no_object_half = no_objects/2
+#no_object_half = 10
 object_loc = []
 
 image_size = 500
@@ -33,29 +33,42 @@ def gaussian2d(a, mux, muy, sigma,x, y):
 	gauss = a*np.exp(-((x-mux)**2/(2*sigma**2))-((y-muy)**2/(2*sigma**2)))
 	return gauss
 
+def sersicIntensity(amplitude, radius, b):
+	#logIntensity = np.log10(amplitude) - k*(radius**0.25)
+	intensity = amplitude*np.exp(-b*(radius**0.25))
+	return intensity
 #make half of the galaxies have amplitude of 4000
-for i in range(no_object_half):
+#for i in range(no_object_half):
+#	loctemp=object_loc[i]
+#	x_centre=loctemp[0]
+#	y_centre=loctemp[1]
+#	for j in range(x_centre-6,x_centre+6): #6 is the radius, arbitrary can be changed
+#		for k in range(y_centre-6,y_centre+6):
+#			basearray[j,k] = gaussian2d(4000,x_centre, y_centre, 13, j, k) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
+for i in range(no_objects):
 	loctemp=object_loc[i]
 	x_centre=loctemp[0]
 	y_centre=loctemp[1]
-	for j in range(x_centre-6,x_centre+6): #6 is the radius, arbitrary can be changed
-		for k in range(y_centre-6,y_centre+6):
-			basearray[j,k] = gaussian2d(4000,x_centre, y_centre, 13, j, k) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
+	radius1 = np.random.randint(3,15)
+	for j in range(x_centre-radius1,x_centre+radius1): #6 is the radius, arbitrary can be changed
+		for k in range(y_centre-radius1,y_centre+radius1):
+			radius2 = np.sqrt((j-x_centre)**2+(k-y_centre)**2)
+			basearray[j,k] = sersicIntensity(4000, radius2, 0.01) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
 
 #make other half of the galaxies have amplitude 10000			
-for i in range(no_object_half):
-	loctemp=object_loc[-i]
-	x_centre=loctemp[0]
-	y_centre=loctemp[1]
-	for j in range(x_centre-8,x_centre+8): #8 is the radius, arbitrary can be changed
-		for k in range(y_centre-8,y_centre+8):
-			basearray[j,k] = gaussian2d(10000,x_centre, y_centre, 13, j, k) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
+#for i in range(no_object_half):
+#	loctemp=object_loc[-i]
+#	x_centre=loctemp[0]
+#	y_centre=loctemp[1]
+#	for j in range(x_centre-8,x_centre+8): #8 is the radius, arbitrary can be changed
+#		for k in range(y_centre-8,y_centre+8):
+#			basearray[j,k] = gaussian2d(10000,x_centre, y_centre, 13, j, k) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
 
 
 plt.figure()
 plt.imshow(basearray)
 
-plt.savetxt('simulatedimage.txt', basearray)
+#plt.savetxt('simulatedimage.txt', basearray)
 
 #
 #base1d = basearray.ravel() #make test image 1D array
