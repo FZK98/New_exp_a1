@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jan 25 04:03:04 2021
-
 @author: User
 """
 
@@ -106,9 +105,12 @@ for i in range(len(masked_data_sorted)):
         local_background = annulus_flux/ (r2**2 - r1**2)
         
         print(len(masked_data_sorted) - i)
-        galaxy_counts.append(apeture_flux - (r1**2)*local_background)
-        coordxy = [x,y]
-        galaxy_locations.append(coordxy)
+        
+        true_flux = apeture_flux - (r1**2)*local_background
+        if true_flux >= 0 :
+            galaxy_counts.append(true_flux)
+            coordxy = [x,y]
+            galaxy_locations.append(coordxy)
     
     
 plt.figure()
