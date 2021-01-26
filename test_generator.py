@@ -33,7 +33,7 @@ def gaussian2d(a, mux, muy, sigma,x, y):
 	gauss = a*np.exp(-((x-mux)**2/(2*sigma**2))-((y-muy)**2/(2*sigma**2)))
 	return gauss
 
-def sersicIntensity(amplitude, radius, b):
+def vaucouleurIntensity(amplitude, radius, b):
 	#logIntensity = np.log10(amplitude) - k*(radius**0.25)
 	intensity = amplitude*np.exp(-b*(radius**0.25))
 	return intensity
@@ -49,11 +49,14 @@ for i in range(no_objects):
 	loctemp=object_loc[i]
 	x_centre=loctemp[0]
 	y_centre=loctemp[1]
-	radius1 = np.random.randint(3,15)
+	maxAmp = np.random.randint(4000,6000)
+	b = 0.1
+	radius1 = (-1*(1/b)*np.log10((popt[1]+4*popt[2])/maxAmp))**4
+	radius1 = int(radius1)
 	for j in range(x_centre-radius1,x_centre+radius1): #6 is the radius, arbitrary can be changed
 		for k in range(y_centre-radius1,y_centre+radius1):
 			radius2 = np.sqrt((j-x_centre)**2+(k-y_centre)**2)
-			basearray[j,k] = sersicIntensity(4000, radius2, 0.01) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
+			basearray[j,k] = vaucouleurIntensity(maxAmp, radius2, b) #makes the objects gaussian blobs, arbitrary amplitude and sigma, can be changed
 
 #make other half of the galaxies have amplitude 10000			
 #for i in range(no_object_half):
