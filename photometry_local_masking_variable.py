@@ -17,7 +17,7 @@ data=hdulist[0].data #astro image data
 #background_data=[] #empty list - store the relevant background data
 hdulist.close()
 
-data = data[1500:1650,1900:2000] #[y,x]
+data = data[1000:1650,1000:2000] #[y,x]
 #datatest=hdulist[0].data
 #show the test image taken 
 plt.figure()
@@ -30,7 +30,7 @@ testimagex = np.shape(data)[1]
 popt = np.loadtxt('image_parameters.txt')
 mask = np.loadtxt('mask.txt')
 #this is the sample of the mask that corresponds to the image
-mask =  mask[1500:1650,1900:2000] #[y,x]
+mask =  mask[1000:1650,1000:2000] #[y,x]
 #displays the mask sample to show is corresponds to the image
 plt.figure()
 plt.imshow(mask)
@@ -115,7 +115,7 @@ for i in range(len(masked_data_sorted)):
             print(len(masked_data_sorted) - i)
         
             true_flux = apeture_flux - (r1**2)*local_background #remove negative fluxes as these are false positives
-            if true_flux >= 0 :
+            if true_flux >= 0:
                 galaxy_counts.append(true_flux)
                 coordxy = [x,y]
                 galaxy_locations.append(coordxy)
