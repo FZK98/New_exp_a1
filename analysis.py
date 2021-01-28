@@ -20,6 +20,9 @@ for i in galaxyCounts:
 	tempMag = ZP-(2.5*np.log10(i))
 	magnitudes.append(tempMag)
 magnitudes=np.sort(magnitudes)
+
+bins1=np.arange(np.min(magnitudes), np.max(magnitudes), 0.2)
+
 numberSmallerMag = []
 for i in range(len(magnitudes)):
 	a=np.where(magnitudes<=magnitudes[i])
@@ -27,7 +30,16 @@ for i in range(len(magnitudes)):
 	#print(b) #a bunch of these are zero oops
 	numberSmallerMag.append(b)
 	
-plt.plot(magnitudes, np.log10(numberSmallerMag),'x')
+numberSmallerMag2 = []
+for i in range(len(bins1)):
+	a=np.where(magnitudes<=bins1[i])
+	b=len(a[0])
+	#print(b) #a bunch of these are zero oops
+	numberSmallerMag2.append(b)
+	
+#plt.plot(magnitudes, np.log10(numberSmallerMag),'x')
+#plt.errorbar(magnitudes, np.log10(numberSmallerMag), 0.434/np.sqrt(numberSmallerMag), marker='x', fmt=' ')
+plt.errorbar(bins1, np.log10(numberSmallerMag2), 0.434/np.sqrt(numberSmallerMag2), marker='x', fmt=' ')
 plt.grid()
 plt.xlabel("Magnitude", fontsize=15)
 plt.ylabel("log(N)", fontsize=15)
