@@ -17,8 +17,8 @@ data=hdulist[0].data #astro image data
 background_data=[] #empty list - store the relevant background data
 hdulist.close()
 
-datatest = data[1500:1650,1900:2000] #[y,x]
-data = data[1500:1650,1900:2000] #[y,x]
+datatest = data#[1500:1650,1900:2000] #[y,x]
+# data = data[1500:1650,1900:2000] #[y,x]
 
 #datatest=hdulist[0].data
 #show the test image taken 
@@ -32,7 +32,7 @@ testimagex = np.shape(datatest)[1]
 popt = np.loadtxt('image_parameters.txt')
 mask = np.loadtxt('mask.txt')
 #this is the sample of the mask that corresponds to the image
-masktest =  mask[1500:1650,1900:2000] #[y,x]
+masktest =  mask#[1500:1650,1900:2000] #[y,x]
 objectmask = np.ones((testimagey, testimagex))
 #displays the mask sample to show is corresponds to the image
 plt.figure()
