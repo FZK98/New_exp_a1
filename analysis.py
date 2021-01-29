@@ -8,19 +8,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy as sp
 from scipy.optimize import curve_fit
-#galaxyCounts=np.loadtxt('fixed_r galaxy counts.txt')
-#galaxyCounts=np.loadtxt('variable_r galaxy counts.txt')
-#galaxyCounts=np.loadtxt('galaxy_counts_plmv270121.txt')
-galaxyCounts=np.loadtxt('variable_r galaxy counts - q = 2,5.txt')
-
+galaxyCounts=np.loadtxt('./q = 2.5, min r = 3, global BG correction/variable_r galaxy counts - q = 2,5.txt')
+#galaxyRadii = np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/galaxy_radii_plmv270121.txt')
 #galaxyLocation=np.loadtxt('galaxy_locations_plmv270121.txt')
 
 ZP=2.530E+01 #taken from header
 ZP_err = 2.0E-2 #taken from header of FITS file
 magnitudes = []
 for i in galaxyCounts:
-	tempMag = ZP-(2.5*np.log10(i))
-	magnitudes.append(tempMag)
+	if i >0:
+	    tempMag = ZP-(2.5*np.log10(i))
+	    magnitudes.append(tempMag)
 magnitudes=np.sort(magnitudes)
 
 bins1=np.arange(np.min(magnitudes), np.max(magnitudes), 0.2)
@@ -51,16 +49,18 @@ def linear(x, m , c):
 	return((m*x)+c)
 
 #choose indices of linear region manually by examining plot
-linearStartIndex = 6
-linearEndIndex = 34
+linearStartIndex = 11
+linearEndIndex = 33
 
 #p = np.polyfit(magnitudes[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag)[linearStartIndex:linearEndIndex],1)
 fitPoints = []
-p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag2[linearStartIndex:linearEndIndex]))
+p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag2[linearStartIndex:linearEndIndex]), sigma=0.434/np.sqrt(numberSmallerMag2)[linearStartIndex:linearEndIndex])
+#p,q=np.polyfit(bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag2[linearStartIndex:linearEndIndex]), 1,w=1/(0.434/np.sqrt(numberSmallerMag2)[linearStartIndex:linearEndIndex]))
+
 for i in range(linearStartIndex, linearEndIndex):
     fitPoints.append(p[0]*bins1[i]+p[1])
 	
-plt.plot(bins1[linearStartIndex:linearEndIndex],fitPoints, label="variable r, q=2.5 , gradient = "+str(p[0]))
+plt.plot(bins1[linearStartIndex:linearEndIndex],fitPoints, label="variable r, q=2.5, minr=3 , gradient = "+str(p[0]))
 plt.legend()
-print("the gradient of the linear part is ",p[0])
+print("the gradient of the linear part is ",p[0], "+/-",np.sqrt(q[0,0]))
 
