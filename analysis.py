@@ -13,9 +13,9 @@ from scipy import stats
 # =============================================================================
 #  import necessary data
 # =============================================================================
-galaxyCounts=np.loadtxt('./r2 = r1 + 3, r min = 3/variable_r galaxy counts.txt')
-magnitudeError=np.loadtxt('./r2 = r1 + 3, r min = 3/Variable_r galaxy magnitude errors.txt')
-#galaxyRadii = np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/galaxy_radii_plmv270121.txt')
+galaxyCounts=np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/variable_r galaxy counts.txt')
+magnitudeError=np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/Variable_r galaxy magnitude errors.txt')
+galaxyRadii = np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/variable_r radius lengths.txt')
 #galaxyLocation=np.loadtxt('galaxy_locations_plmv270121.txt')
 
 ZP=2.530E+01 #zero point calbration taken from header
@@ -23,7 +23,6 @@ ZP_err = 2.0E-2 #taken from header of FITS file
 
 magnitudes = []
 magnitudeError2 = [] #errors corresponding to positive fluxes
-
 for i in range(len(galaxyCounts)):
 	if galaxyCounts[i]>0: #filter out negative fluxes 
 		tempMag=ZP-2.5*np.log10(galaxyCounts[i])
@@ -65,20 +64,23 @@ for i in range(len(bins1)):
 binError = [] #difference in bin population when magnitude at highest vs lowest values
 for i in range(len(numberSmallerMag)):
 	errorTemp = numberSmallerMag_min[i] - numberSmallerMag_max[i]
-	binError.append(errorTemp) 
+	binError.append(0.434/errorTemp)
 
 poissonError = [] #sqrt(N) error associated with counting pixels
 for i in range(len(numberSmallerMag)):
 	poissonError.append(0.434/np.sqrt(numberSmallerMag[i]))
 	
-
+radiusBins = []
+for i in bins1:
+	radiusBins.append((i-25.3)/(-2.5*0.434))
 
 # =============================================================================
 # ### plotting
 # =============================================================================
 #plt.plot(magnitudes, np.log10(numberSmallerMag),'x') #plotting magnitude with no error bars
 #plt.errorbar(magnitudesSorted[:][0], np.log10(numberSmallerMag), 0.434/np.sqrt(numberSmallerMag), marker='x', fmt=' ') #plotting magnitude with errorbars
-plt.errorbar(bins1, np.log10(numberSmallerMag), poissonError, marker='x', fmt=' ') #plotting binned data with errorbars
+plt.errorbar(radiusBins, np.log10(numberSmallerMag), (binError), marker='x', fmt=' ') #plotting binned data with errorbars
+#plt.plot(binsRad, np.log10(numberSmallerMag))
 plt.grid()
 plt.xlabel("Magnitude", fontsize=15)
 plt.ylabel("log(N)", fontsize=15)
@@ -97,12 +99,12 @@ linearEndIndex = 33
 
 #p = np.polyfit(magnitudes[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag)[linearStartIndex:linearEndIndex],1) #perform a linear fit
 fitPoints = [] #y values for the linear fit plot
-p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag[linearStartIndex:linearEndIndex]), sigma=np.log10(binError)[linearStartIndex:linearEndIndex], absolute_sigma = True)  #perform a linear fit
+p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag[linearStartIndex:linearEndIndex]), sigma=(binError)[linearStartIndex:linearEndIndex], absolute_sigma = True)  #perform a linear fit
 #p,q=np.polyfit(bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag2[linearStartIndex:linearEndIndex]), 1,w=1/(np.log10(binError)[linearStartIndex:linearEndIndex]))  #perform a linear fit
 
 for i in range(linearStartIndex, linearEndIndex):
     fitPoints.append(p[0]*bins1[i]+p[1])
 	
-plt.plot(bins1[linearStartIndex:linearEndIndex],fitPoints, label="variable r, q=2.5, minr=3, mask = mu+10, gradient = "+str(p[0])) #plot the linear fit on top of data
+plt.plot(bins1[linearStartIndex:linearEndIndex],fitPoints, label="variable r, r2=r1+3, minr=3, mask = mu+2, gradient = "+str(p[0])) #plot the linear fit on top of data
 plt.legend()
 print("the gradient of the linear part is ",p[0], "+/-",np.sqrt(q[0,0]))
