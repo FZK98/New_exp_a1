@@ -33,7 +33,7 @@ for i in range (imagey):
         if i <= 200 or j <= 200 or j >= 2370 or i>= 4411: 
             mask[i,j] = 0
         # masking pixel values below 2 std devs from the mean 
-        if data[i][j] <= popt[1] + 4*popt[2]:
+        if data[i][j] <= popt[1] + 2*popt[2]:
             mask[i][j] = 0
         #mask oversaturated pixels
         if data[i][j] >= 50000:
@@ -49,6 +49,15 @@ mask[200:285,1390:1480] = 0
 mask[3370:7420,770:784] = 0
 mask[3200:3279,770:784] = 0
 #masking the stars (identified by eye)
+mask[420:460,1025:1050] = 0
+mask[2220:2240,900:910] = 0
+mask[4320:4500, 200:400] = 0
+mask[3740:3660,2120:2140] = 0
+mask[420:440, 1100:1200] = 0
+mask[2940:3900, 180:210] = 0
+mask[4000:4030, 1450:1470] = 0
+mask[2820:3000, 1400:1470] = 0
+
 mask[2900:3525,1130:1755] = 0
 mask[2225:2370,855:980] = 0
 mask[2700:2855,915:1035] = 0
