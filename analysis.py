@@ -16,7 +16,6 @@ from scipy import stats
 galaxyCounts=np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/variable_r galaxy counts.txt')
 magnitudeError=np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/Variable_r galaxy magnitude errors.txt')
 galaxyRadii = np.loadtxt('./full scan q = 2, r min = 2, local BG corrected/variable_r radius lengths.txt')
-#galaxyLocation=np.loadtxt('galaxy_locations_plmv270121.txt')
 
 ZP=2.530E+01 #zero point calbration taken from header
 ZP_err = 2.0E-2 #taken from header of FITS file
@@ -77,10 +76,9 @@ for i in bins1:
 # =============================================================================
 # ### plotting
 # =============================================================================
-#plt.plot(magnitudes, np.log10(numberSmallerMag),'x') #plotting magnitude with no error bars
-#plt.errorbar(magnitudesSorted[:][0], np.log10(numberSmallerMag), 0.434/np.sqrt(numberSmallerMag), marker='x', fmt=' ') #plotting magnitude with errorbars
-plt.errorbar(radiusBins, np.log10(numberSmallerMag), (binError), marker='x', fmt=' ') #plotting binned data with errorbars
-#plt.plot(binsRad, np.log10(numberSmallerMag))
+#set 3rd argument to binError or poissonError
+#set 1st argument to radiusBins to check radius behaviour
+plt.errorbar(bins1, np.log10(numberSmallerMag), poissonError, marker='x', fmt=' ') #plotting binned data with errorbars
 plt.grid()
 plt.xlabel("Magnitude", fontsize=15)
 plt.ylabel("log(N)", fontsize=15)
@@ -97,11 +95,11 @@ def linear(x, m, c):
 linearStartIndex = 11
 linearEndIndex = 33
 
-#p = np.polyfit(magnitudes[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag)[linearStartIndex:linearEndIndex],1) #perform a linear fit
-fitPoints = [] #y values for the linear fit plot
-p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag[linearStartIndex:linearEndIndex]), sigma=(binError)[linearStartIndex:linearEndIndex], absolute_sigma = True)  #perform a linear fit
-#p,q=np.polyfit(bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag2[linearStartIndex:linearEndIndex]), 1,w=1/(np.log10(binError)[linearStartIndex:linearEndIndex]))  #perform a linear fit
 
+#set sigma to binError or poissonError
+p,q=sp.optimize.curve_fit(linear, bins1[linearStartIndex:linearEndIndex], np.log10(numberSmallerMag[linearStartIndex:linearEndIndex]), sigma=(binError)[linearStartIndex:linearEndIndex], absolute_sigma = True)  #perform a linear fit
+
+fitPoints = [] #y values for the linear fit plot
 for i in range(linearStartIndex, linearEndIndex):
     fitPoints.append(p[0]*bins1[i]+p[1])
 	
